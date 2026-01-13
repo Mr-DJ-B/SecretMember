@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sign Up - Secret Member</title>
     <style>
         * {
             margin: 0;
@@ -21,13 +21,20 @@
             min-height: 100vh;
         }
 
-        #loginForm {
+        #signupForm {
             background: #0f3460;
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 400px;
+        }
+
+        h2 {
+            color: #00d4ff;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
         }
 
         label {
@@ -82,58 +89,119 @@
             box-shadow: 0 4px 10px rgba(0, 212, 255, 0.2);
         }
 
-        .signup-link {
+        .login-link {
             text-align: center;
             margin-top: 20px;
             color: #a0a0a0;
             font-size: 14px;
         }
 
-        .signup-link a {
+        .login-link a {
             color: #00d4ff;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
         }
 
-        .signup-link a:hover {
+        .login-link a:hover {
             color: #00e6ff;
             text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #27ae60;
+            color: #fff;
+            display: block;
+        }
+
+        .message.error {
+            background: #e74c3c;
+            color: #fff;
+            display: block;
         }
     </style>
 </head>
 
 <body>
 
-    <form id="loginForm">
+    <form id="signupForm">
+        <h2>Create Account</h2>
+        <div id="message" class="message"></div>
+
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
 
-        <button type="submit">Login</button>
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
 
-        <div class="signup-link">
-            Don't have an account? <a href="signup.html">Sign up here</a>
+        <button type="submit">Sign Up</button>
+
+        <div class="login-link">
+            Already have an account? <a href="index.html">Log in here</a>
         </div>
     </form>
 
     <script src="script.js"></script>
     <script>
-        // Handle login form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            const result = login(username, password);
-            
-            if (!result.success) {
-                alert(result.message);
-                // Clear password field on failed login
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('message');
+
+            // Validate password match
+            if (password !== confirmPassword) {
+                messageDiv.textContent = 'Passwords do not match. Please try again.';
+                messageDiv.className = 'message error';
+                document.getElementById('confirmPassword').value = '';
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 3) {
+                messageDiv.textContent = 'Password must be at least 3 characters long.';
+                messageDiv.className = 'message error';
+                return;
+            }
+
+            // Call signup function
+            const result = signUp(username, password, email);
+
+            if (result.success) {
+                messageDiv.textContent = result.message + ' Redirecting to login...';
+                messageDiv.className = 'message success';
+                
+                // Clear form
+                document.getElementById('signupForm').reset();
+                
+                // Redirect to login page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            } else {
+                messageDiv.textContent = result.message;
+                messageDiv.className = 'message error';
                 document.getElementById('password').value = '';
+                document.getElementById('confirmPassword').value = '';
             }
         });
     </script>
